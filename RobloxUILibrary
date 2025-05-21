@@ -1,0 +1,153 @@
+local RobloxUI = {}
+
+local library = Instance.new("ScreenGui")
+library.Name = "RobloxUI"
+library.ResetOnSpawn = false
+library.Parent = game:GetService("CoreGui")
+
+local Main = Instance.new("Frame")
+Main.Size = UDim2.new(0, 600, 0, 400)
+Main.Position = UDim2.new(0.5, -300, 0.5, -200)
+Main.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Main.BorderSizePixel = 0
+Main.Parent = library
+Main.Active = true
+Main.Draggable = true
+
+local UICorner = Instance.new("UICorner", Main)
+UICorner.CornerRadius = UDim.new(0, 8)
+
+local Title = Instance.new("TextLabel", Main)
+Title.Text = "RobloxUI  |  By You"
+Title.Font = Enum.Font.GothamBold
+Title.TextColor3 = Color3.fromRGB(0, 0, 0)
+Title.TextSize = 16
+Title.Size = UDim2.new(1, -40, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 10, 0, 5)
+
+local Close = Instance.new("TextButton", Main)
+Close.Text = "X"
+Close.Size = UDim2.new(0, 30, 0, 30)
+Close.Position = UDim2.new(1, -35, 0, 5)
+Close.BackgroundTransparency = 1
+Close.TextColor3 = Color3.fromRGB(0, 0, 0)
+Close.Font = Enum.Font.GothamBold
+Close.TextSize = 14
+Close.MouseButton1Click:Connect(function()
+    library:Destroy()
+end)
+
+local TabList = Instance.new("Frame", Main)
+TabList.Size = UDim2.new(0, 140, 1, -40)
+TabList.Position = UDim2.new(0, 0, 0, 40)
+TabList.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
+Instance.new("UICorner", TabList).CornerRadius = UDim.new(0, 8)
+
+local ContentFrame = Instance.new("Frame", Main)
+ContentFrame.Size = UDim2.new(1, -150, 1, -40)
+ContentFrame.Position = UDim2.new(0, 150, 0, 40)
+ContentFrame.BackgroundTransparency = 1
+
+local Tabs = {}
+
+function RobloxUI:CreateTab(tabName, icon)
+    local TabBtn = Instance.new("TextButton")
+    TabBtn.Text = (icon and icon .. "  " or "") .. tabName
+    TabBtn.Size = UDim2.new(1, -10, 0, 40)
+    TabBtn.Position = UDim2.new(0, 5, 0, #Tabs * 45 + 5)
+    TabBtn.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+    TabBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
+    TabBtn.Font = Enum.Font.GothamBold
+    TabBtn.TextSize = 14
+    TabBtn.Parent = TabList
+    Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 6)
+
+    local TabPage = Instance.new("ScrollingFrame")
+    TabPage.Size = UDim2.new(1, 0, 1, 0)
+    TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
+    TabPage.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    TabPage.BackgroundTransparency = 1
+    TabPage.Visible = #Tabs == 0
+    TabPage.Parent = ContentFrame
+
+    local Layout = Instance.new("UIListLayout", TabPage)
+    Layout.Padding = UDim.new(0, 6)
+    Layout.SortOrder = Enum.SortOrder.LayoutOrder
+
+    table.insert(Tabs, TabPage)
+
+    TabBtn.MouseButton1Click:Connect(function()
+        for _, tab in pairs(Tabs) do tab.Visible = false end
+        TabPage.Visible = true
+    end)
+
+    local SectionAPI = {}
+
+    function SectionAPI:AddButton(text, callback)
+        local Btn = Instance.new("TextButton")
+        Btn.Size = UDim2.new(1, -20, 0, 30)
+        Btn.Text = text
+        Btn.BackgroundColor3 = Color3.fromRGB(51, 95, 254)
+        Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Btn.Font = Enum.Font.GothamBold
+        Btn.TextSize = 14
+        Btn.Parent = TabPage
+        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+        Btn.MouseButton1Click:Connect(function()
+            if callback then callback() end
+        end)
+    end
+
+    function SectionAPI:AddLabel(text)
+        local Label = Instance.new("TextLabel")
+        Label.Size = UDim2.new(1, -20, 0, 25)
+        Label.Text = text
+        Label.BackgroundTransparency = 1
+        Label.TextColor3 = Color3.fromRGB(0, 0, 0)
+        Label.Font = Enum.Font.Gotham
+        Label.TextSize = 14
+        Label.Parent = TabPage
+    end
+
+    function SectionAPI:AddTextbox(placeholder, callback)
+        local Box = Instance.new("TextBox")
+        Box.Size = UDim2.new(1, -20, 0, 30)
+        Box.PlaceholderText = placeholder
+        Box.Text = ""
+        Box.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+        Box.TextColor3 = Color3.fromRGB(0, 0, 0)
+        Box.Font = Enum.Font.Gotham
+        Box.TextSize = 14
+        Box.Parent = TabPage
+        Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 6)
+        Box.FocusLost:Connect(function()
+            if callback then callback(Box.Text) end
+        end)
+    end
+
+    function SectionAPI:AddImage(imageId)
+        local Img = Instance.new("ImageLabel")
+        Img.Size = UDim2.new(0, 100, 0, 100)
+        Img.Image = imageId
+        Img.BackgroundTransparency = 1
+        Img.Parent = TabPage
+    end
+
+    function SectionAPI:AddDiscordInvite(code)
+        SectionAPI:AddLabel("Junte-se ao nosso Discord!")
+        local Btn = Instance.new("TextButton")
+        Btn.Size = UDim2.new(1, -20, 0, 30)
+        Btn.Text = "discord.gg/" .. code
+        Btn.BackgroundColor3 = Color3.fromRGB(51, 95, 254)
+        Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Btn.Font = Enum.Font.GothamBold
+        Btn.TextSize = 14
+        Btn.Parent = TabPage
+        Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 6)
+    end
+
+    return SectionAPI
+end
+
+return RobloxUI
