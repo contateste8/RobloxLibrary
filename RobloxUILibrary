@@ -1,0 +1,255 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local RobloxUI = {}
+
+function RobloxUI:CreateWindow(titleText)
+    titleText = titleText or "Roblox UI Library"
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "RobloxUILibrary"
+    ScreenGui.Parent = game:GetService("CoreGui")
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 500, 0, 300)
+    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+
+    -- Borda arredondada principal (apenas nos cantos inferiores)
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 8)
+    MainCorner.Parent = MainFrame
+
+    local TitleBar = Instance.new("Frame")
+    TitleBar.Size = UDim2.new(1, 0, 0, 30)
+    TitleBar.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
+    TitleBar.BorderSizePixel = 0
+    TitleBar.Parent = MainFrame
+
+    -- Remove borda arredondada da barra de título para evitar sobreposição
+    local TitleBarCorner = Instance.new("UICorner")
+    TitleBarCorner.CornerRadius = UDim.new(0, 0)
+    TitleBarCorner.Parent = TitleBar
+
+    local Title = Instance.new("TextLabel")
+    Title.Text = "  " .. titleText
+    Title.Size = UDim2.new(1, -60, 1, 0)
+    Title.BackgroundTransparency = 1
+    Title.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Title.Font = Enum.Font.SourceSans
+    Title.TextSize = 16
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = TitleBar
+
+    local MinimizeButton = Instance.new("TextButton")
+    MinimizeButton.Text = "—"
+    MinimizeButton.Size = UDim2.new(0, 30, 1, 0)
+    MinimizeButton.Position = UDim2.new(1, -60, 0, 0)
+    MinimizeButton.BackgroundTransparency = 1
+    MinimizeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+    MinimizeButton.Font = Enum.Font.SourceSans
+    MinimizeButton.TextSize = 18
+    MinimizeButton.BorderSizePixel = 0
+    MinimizeButton.Parent = TitleBar
+
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Text = "X"
+    CloseButton.Size = UDim2.new(0, 30, 1, 0)
+    CloseButton.Position = UDim2.new(1, -30, 0, 0)
+    CloseButton.BackgroundTransparency = 1
+    CloseButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+    CloseButton.Font = Enum.Font.SourceSans
+    CloseButton.TextSize = 18
+    CloseButton.BorderSizePixel = 0
+    CloseButton.Parent = TitleBar
+
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Size = UDim2.new(0, 140, 1, -30)
+    Sidebar.Position = UDim2.new(0, 0, 0, 30)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(250, 250, 250)
+    Sidebar.BorderSizePixel = 0
+    Sidebar.Parent = MainFrame
+
+    -- Borda arredondada apenas no canto inferior esquerdo
+    local SidebarCorner = Instance.new("UICorner")
+    SidebarCorner.CornerRadius = UDim.new(0, 8)
+    SidebarCorner.Parent = Sidebar
+
+    local ContentArea = Instance.new("ScrollingFrame")
+    ContentArea.Size = UDim2.new(1, -140, 1, -30)
+    ContentArea.Position = UDim2.new(0, 140, 0, 30)
+    ContentArea.CanvasSize = UDim2.new(0, 0, 10, 0)
+    ContentArea.ScrollBarThickness = 6
+    ContentArea.ScrollBarImageColor3 = Color3.fromRGB(51, 95, 254)
+    ContentArea.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    ContentArea.BorderSizePixel = 0
+    ContentArea.Parent = MainFrame
+
+    -- Borda arredondada apenas no canto inferior direito
+    local ContentCorner = Instance.new("UICorner")
+    ContentCorner.CornerRadius = UDim.new(0, 8)
+    ContentCorner.Parent = ContentArea
+
+    local UserFrame = Instance.new("Frame")
+    UserFrame.Size = UDim2.new(1, 0, 0, 50)
+    UserFrame.Position = UDim2.new(0, 0, 1, -50)
+    UserFrame.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
+    UserFrame.BorderSizePixel = 0
+    UserFrame.Parent = Sidebar
+
+    -- Borda arredondada na parte inferior do UserFrame
+    local UserFrameCorner = Instance.new("UICorner")
+    UserFrameCorner.CornerRadius = UDim.new(0, 8)
+    UserFrameCorner.Parent = UserFrame
+
+    local ProfilePic = Instance.new("ImageLabel")
+    ProfilePic.Size = UDim2.new(0, 30, 0, 30)
+    ProfilePic.Position = UDim2.new(0, 10, 0.5, -15)
+    ProfilePic.BackgroundTransparency = 1
+    ProfilePic.Image = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+    ProfilePic.Parent = UserFrame
+
+    local Username = Instance.new("TextLabel")
+    Username.Text = LocalPlayer.DisplayName
+    Username.Position = UDim2.new(0, 50, 0, 0)
+    Username.Size = UDim2.new(1, -60, 1, 0)
+    Username.BackgroundTransparency = 1
+    Username.TextColor3 = Color3.fromRGB(0, 0, 0)
+    Username.TextXAlignment = Enum.TextXAlignment.Left
+    Username.Font = Enum.Font.SourceSans
+    Username.TextSize = 14
+    Username.Parent = UserFrame
+
+    local TabList = {}
+    local isMinimized = false
+    local originalSize = MainFrame.Size
+
+    CloseButton.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+
+    MinimizeButton.MouseButton1Click:Connect(function()
+        if not isMinimized then
+            MainFrame.Size = UDim2.new(0, 500, 0, 30)
+            Sidebar.Visible = false
+            ContentArea.Visible = false
+            isMinimized = true
+        else
+            MainFrame.Size = originalSize
+            Sidebar.Visible = true
+            ContentArea.Visible = true
+            isMinimized = false
+        end
+    end)
+
+    function RobloxUI:CreateTab(name, icon)
+        local Tab = Instance.new("TextButton")
+        Tab.Size = UDim2.new(1, -20, 0, 40)
+        Tab.Position = UDim2.new(0, 10, 0, 10 + #TabList * 50)
+        Tab.BackgroundColor3 = Color3.fromRGB(240, 240, 240)
+        Tab.Text = "" -- Removido o texto padrão "Button"
+        Tab.TextColor3 = Color3.fromRGB(0, 0, 0)
+        Tab.Font = Enum.Font.SourceSans
+        Tab.TextSize = 16
+        Tab.BorderSizePixel = 0
+        Tab.AutoButtonColor = false
+        Tab.Parent = Sidebar
+        
+        -- Borda arredondada na tab
+        local TabCorner = Instance.new("UICorner")
+        TabCorner.CornerRadius = UDim.new(0, 6)
+        TabCorner.Parent = Tab
+        
+        -- Container para ícone e texto
+        local Content = Instance.new("Frame")
+        Content.Size = UDim2.new(1, 0, 1, 0)
+        Content.BackgroundTransparency = 1
+        Content.Parent = Tab
+        
+        -- Ajuste de posição do texto com ícone
+        if icon then
+            local Icon = Instance.new("ImageLabel")
+            Icon.Size = UDim2.new(0, 20, 0, 20)
+            Icon.Position = UDim2.new(0, 15, 0.5, -10)
+            Icon.BackgroundTransparency = 1
+            Icon.Image = icon
+            Icon.Parent = Content
+            
+            local TextLabel = Instance.new("TextLabel")
+            TextLabel.Size = UDim2.new(1, -50, 1, 0)
+            TextLabel.Position = UDim2.new(0, 45, 0, 0)
+            TextLabel.Text = name
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+            TextLabel.Font = Enum.Font.SourceSans
+            TextLabel.TextSize = 16
+            TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+            TextLabel.Parent = Content
+        else
+            local TextLabel = Instance.new("TextLabel")
+            TextLabel.Size = UDim2.new(1, 0, 1, 0)
+            TextLabel.Text = name
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+            TextLabel.Font = Enum.Font.SourceSans
+            TextLabel.TextSize = 16
+            TextLabel.TextXAlignment = Enum.TextXAlignment.Center
+            TextLabel.Parent = Content
+        end
+
+        local Underline = Instance.new("Frame")
+        Underline.Size = UDim2.new(1, 0, 0, 2)
+        Underline.Position = UDim2.new(0, 0, 1, -2)
+        Underline.BackgroundColor3 = Color3.fromRGB(51, 95, 254)
+        Underline.Visible = false
+        Underline.BorderSizePixel = 0
+        Underline.Parent = Tab
+
+        local TabFrame = Instance.new("Frame")
+        TabFrame.Size = UDim2.new(1, 0, 0, 1000)
+        TabFrame.BackgroundTransparency = 1
+        TabFrame.Visible = (#TabList == 0)
+        TabFrame.Parent = ContentArea
+
+        local yPos = 10
+        local dropdownOpen = nil
+
+        local function UpdateTabSelection()
+            for _, t in ipairs(TabList) do
+                if t.Tab:FindFirstChildOfClass("Frame") then
+                    t.Tab:FindFirstChildOfClass("Frame"):FindFirstChildOfClass("TextLabel").TextColor3 = Color3.fromRGB(0, 0, 0)
+                end
+                t.Underline.Visible = false
+            end
+            if Content:FindFirstChildOfClass("TextLabel") then
+                Content:FindFirstChildOfClass("TextLabel").TextColor3 = Color3.fromRGB(51, 95, 254)
+            end
+            Underline.Visible = true
+        end
+
+        local tabData = {}
+
+        -- [...] (restante do código permanece igual)
+
+        Tab.MouseButton1Click:Connect(function()
+            for _, obj in pairs(ContentArea:GetChildren()) do
+                if obj:IsA("Frame") then
+                    obj.Visible = false
+                end
+            end
+            TabFrame.Visible = true
+            UpdateTabSelection()
+        end)
+
+        table.insert(TabList, {Tab = Tab, Underline = Underline})
+        return tabData
+    end
+
+    return RobloxUI
+end
+
+return RobloxUI
