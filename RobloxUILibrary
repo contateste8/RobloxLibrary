@@ -1,0 +1,509 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local RobloxUI = {}
+
+function RobloxUI:CreateWindow(titleText)
+    titleText = titleText or "Roblox UI Library"
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "RobloxUILibrary"
+    ScreenGui.Parent = game:GetService("CoreGui")
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 500, 0, 300)
+    MainFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Active = true
+    MainFrame.Draggable = true
+    MainFrame.Parent = ScreenGui
+
+    -- Borda arredondada em todos os cantos
+    local MainCorner = Instance.new("UICorner")
+    MainCorner.CornerRadius = UDim.new(0, 8)
+    MainCorner.Parent = MainFrame
+
+    local TitleBar = Instance.new("Frame")
+    TitleBar.Size = UDim2.new(1, 0, 0, 30)
+    TitleBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    TitleBar.BorderSizePixel = 0
+    TitleBar.Parent = MainFrame
+
+    -- Borda arredondada apenas no topo
+    local TitleBarCorner = Instance.new("UICorner")
+    TitleBarCorner.CornerRadius = UDim.new(0, 8)
+    TitleBarCorner.Parent = TitleBar
+
+    local Title = Instance.new("TextLabel")
+    Title.Text = "  " .. titleText
+    Title.Size = UDim2.new(1, -60, 1, 0)
+    Title.BackgroundTransparency = 1
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.Font = Enum.Font.SourceSansBold
+    Title.TextSize = 16
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = TitleBar
+
+    local MinimizeButton = Instance.new("TextButton")
+    MinimizeButton.Text = "—"
+    MinimizeButton.Size = UDim2.new(0, 30, 1, 0)
+    MinimizeButton.Position = UDim2.new(1, -60, 0, 0)
+    MinimizeButton.BackgroundTransparency = 1
+    MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MinimizeButton.Font = Enum.Font.SourceSansBold
+    MinimizeButton.TextSize = 18
+    MinimizeButton.BorderSizePixel = 0
+    MinimizeButton.Parent = TitleBar
+
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Text = "×"
+    CloseButton.Size = UDim2.new(0, 30, 1, 0)
+    CloseButton.Position = UDim2.new(1, -30, 0, 0)
+    CloseButton.BackgroundTransparency = 1
+    CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CloseButton.Font = Enum.Font.SourceSansBold
+    CloseButton.TextSize = 22
+    CloseButton.BorderSizePixel = 0
+    CloseButton.Parent = TitleBar
+
+    local Sidebar = Instance.new("Frame")
+    Sidebar.Size = UDim2.new(0, 140, 1, -30)
+    Sidebar.Position = UDim2.new(0, 0, 0, 30)
+    Sidebar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Sidebar.BorderSizePixel = 0
+    Sidebar.Parent = MainFrame
+
+    local ContentArea = Instance.new("ScrollingFrame")
+    ContentArea.Size = UDim2.new(1, -140, 1, -30)
+    ContentArea.Position = UDim2.new(0, 140, 0, 30)
+    ContentArea.CanvasSize = UDim2.new(0, 0, 10, 0)
+    ContentArea.ScrollBarThickness = 6
+    ContentArea.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
+    ContentArea.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    ContentArea.BorderSizePixel = 0
+    ContentArea.Parent = MainFrame
+
+    local UserFrame = Instance.new("Frame")
+    UserFrame.Size = UDim2.new(1, 0, 0, 50)
+    UserFrame.Position = UDim2.new(0, 0, 1, -50)
+    UserFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    UserFrame.BorderSizePixel = 0
+    UserFrame.Parent = Sidebar
+
+    -- Borda arredondada na parte inferior
+    local UserFrameCorner = Instance.new("UICorner")
+    UserFrameCorner.CornerRadius = UDim.new(0, 8)
+    UserFrameCorner.Parent = UserFrame
+
+    local ProfilePic = Instance.new("ImageLabel")
+    ProfilePic.Size = UDim2.new(0, 30, 0, 30)
+    ProfilePic.Position = UDim2.new(0, 10, 0.5, -15)
+    ProfilePic.BackgroundTransparency = 1
+    ProfilePic.Image = Players:GetUserThumbnailAsync(LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+    ProfilePic.Parent = UserFrame
+
+    local Username = Instance.new("TextLabel")
+    Username.Text = LocalPlayer.DisplayName
+    Username.Position = UDim2.new(0, 50, 0, 0)
+    Username.Size = UDim2.new(1, -60, 1, 0)
+    Username.BackgroundTransparency = 1
+    Username.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Username.TextXAlignment = Enum.TextXAlignment.Left
+    Username.Font = Enum.Font.SourceSans
+    Username.TextSize = 14
+    Username.Parent = UserFrame
+
+    local TabList = {}
+    local isMinimized = false
+    local originalSize = MainFrame.Size
+
+    CloseButton.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+
+    MinimizeButton.MouseButton1Click:Connect(function()
+        if not isMinimized then
+            MainFrame.Size = UDim2.new(0, 500, 0, 30)
+            Sidebar.Visible = false
+            ContentArea.Visible = false
+            MinimizeButton.Text = "+"
+            isMinimized = true
+        else
+            MainFrame.Size = originalSize
+            Sidebar.Visible = true
+            ContentArea.Visible = true
+            MinimizeButton.Text = "—"
+            isMinimized = false
+        end
+    end)
+
+    function RobloxUI:CreateTab(name, icon)
+        local Tab = Instance.new("TextButton")
+        Tab.Size = UDim2.new(1, -20, 0, 40)
+        Tab.Position = UDim2.new(0, 10, 0, 10 + #TabList * 50)
+        Tab.Text = ""
+        Tab.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        Tab.TextColor3 = Color3.fromRGB(200, 200, 200)
+        Tab.Font = Enum.Font.SourceSans
+        Tab.TextSize = 16
+        Tab.BorderSizePixel = 0
+        Tab.AutoButtonColor = false
+        Tab.Parent = Sidebar
+        
+        -- Borda arredondada na tab
+        local TabCorner = Instance.new("UICorner")
+        TabCorner.CornerRadius = UDim.new(0, 6)
+        TabCorner.Parent = Tab
+        
+        -- Container para conteúdo
+        local Content = Instance.new("Frame")
+        Content.Size = UDim2.new(1, 0, 1, 0)
+        Content.BackgroundTransparency = 1
+        Content.Parent = Tab
+        
+        -- Ajuste de posição do texto com/without ícone
+        if icon then
+            local Icon = Instance.new("ImageLabel")
+            Icon.Size = UDim2.new(0, 20, 0, 20)
+            Icon.Position = UDim2.new(0, 15, 0.5, -10)
+            Icon.BackgroundTransparency = 1
+            Icon.Image = icon
+            Icon.Parent = Content
+            
+            local TextLabel = Instance.new("TextLabel")
+            TextLabel.Size = UDim2.new(1, -50, 1, 0)
+            TextLabel.Position = UDim2.new(0, 45, 0, 0)
+            TextLabel.Text = name
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+            TextLabel.Font = Enum.Font.SourceSans
+            TextLabel.TextSize = 16
+            TextLabel.TextXAlignment = Enum.TextXAlignment.Left
+            TextLabel.Parent = Content
+        else
+            local TextLabel = Instance.new("TextLabel")
+            TextLabel.Size = UDim2.new(1, 0, 1, 0)
+            TextLabel.Text = name
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+            TextLabel.Font = Enum.Font.SourceSans
+            TextLabel.TextSize = 16
+            TextLabel.TextXAlignment = Enum.TextXAlignment.Center
+            TextLabel.Parent = Content
+        end
+
+        local Underline = Instance.new("Frame")
+        Underline.Size = UDim2.new(1, 0, 0, 2)
+        Underline.Position = UDim2.new(0, 0, 1, -2)
+        Underline.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+        Underline.Visible = false
+        Underline.BorderSizePixel = 0
+        Underline.Parent = Tab
+
+        local TabFrame = Instance.new("Frame")
+        TabFrame.Size = UDim2.new(1, 0, 0, 1000)
+        TabFrame.BackgroundTransparency = 1
+        TabFrame.Visible = (#TabList == 0)
+        TabFrame.Parent = ContentArea
+
+        local yPos = 10
+        local dropdownOpen = nil
+
+        local function UpdateTabSelection()
+            for _, t in ipairs(TabList) do
+                if t.Tab:FindFirstChildOfClass("Frame") then
+                    t.Tab:FindFirstChildOfClass("Frame"):FindFirstChildOfClass("TextLabel").TextColor3 = Color3.fromRGB(200, 200, 200)
+                end
+                t.Underline.Visible = false
+            end
+            if Content:FindFirstChildOfClass("TextLabel") then
+                Content:FindFirstChildOfClass("TextLabel").TextColor3 = Color3.fromRGB(255, 255, 255)
+            end
+            Underline.Visible = true
+        end
+
+        local tabData = {}
+
+        function tabData:AddSection(title)
+            local SectionFrame = Instance.new("Frame")
+            SectionFrame.Size = UDim2.new(1, -20, 0, 30)
+            SectionFrame.Position = UDim2.new(0, 10, 0, yPos)
+            SectionFrame.BackgroundTransparency = 1
+            SectionFrame.Parent = TabFrame
+            
+            local SectionLabel = Instance.new("TextLabel")
+            SectionLabel.Size = UDim2.new(1, 0, 1, 0)
+            SectionLabel.Text = " "..title
+            SectionLabel.BackgroundTransparency = 1
+            SectionLabel.TextColor3 = Color3.fromRGB(0, 120, 215)
+            SectionLabel.Font = Enum.Font.SourceSansBold
+            SectionLabel.TextSize = 16
+            SectionLabel.TextXAlignment = Enum.TextXAlignment.Left
+            SectionLabel.Parent = SectionFrame
+            
+            local Line = Instance.new("Frame")
+            Line.Size = UDim2.new(1, 0, 0, 1)
+            Line.Position = UDim2.new(0, 0, 1, 0)
+            Line.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            Line.BorderSizePixel = 0
+            Line.Parent = SectionFrame
+            
+            yPos = yPos + 40
+            
+            return {
+                UpdateTitle = function(self, newTitle)
+                    SectionLabel.Text = " "..newTitle
+                end
+            }
+        end
+
+        function tabData:AddButton(text, callback)
+            if dropdownOpen then return end
+            
+            local Button = Instance.new("TextButton")
+            Button.Size = UDim2.new(1, -20, 0, 30)
+            Button.Position = UDim2.new(0, 10, 0, yPos)
+            Button.Text = text
+            Button.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.Font = Enum.Font.SourceSans
+            Button.TextSize = 16
+            Button.BorderSizePixel = 0
+            Button.AutoButtonColor = true
+            Button.Parent = TabFrame
+            
+            local ButtonCorner = Instance.new("UICorner")
+            ButtonCorner.CornerRadius = UDim.new(0, 4)
+            ButtonCorner.Parent = Button
+
+            Button.MouseButton1Click:Connect(function()
+                if callback then callback() end
+            end)
+
+            yPos = yPos + 40
+            
+            return {
+                UpdateText = function(self, newText)
+                    Button.Text = newText
+                end,
+                UpdateCallback = function(self, newCallback)
+                    callback = newCallback
+                end
+            }
+        end
+
+        function tabData:AddToggle(text, callback)
+            if dropdownOpen then return end
+            
+            local Toggle = Instance.new("TextButton")
+            Toggle.Size = UDim2.new(1, -20, 0, 30)
+            Toggle.Position = UDim2.new(0, 10, 0, yPos)
+            Toggle.Text = text .. " [OFF]"
+            Toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Toggle.TextColor3 = Color3.fromRGB(200, 200, 200)
+            Toggle.Font = Enum.Font.SourceSans
+            Toggle.TextSize = 16
+            Toggle.BorderSizePixel = 0
+            Toggle.Parent = TabFrame
+            
+            local ToggleCorner = Instance.new("UICorner")
+            ToggleCorner.CornerRadius = UDim.new(0, 4)
+            ToggleCorner.Parent = Toggle
+
+            local toggled = false
+
+            Toggle.MouseButton1Click:Connect(function()
+                toggled = not toggled
+                Toggle.Text = text .. (toggled and " [ON]" or " [OFF]")
+                Toggle.BackgroundColor3 = toggled and Color3.fromRGB(0, 90, 160) or Color3.fromRGB(50, 50, 50)
+                if callback then callback(toggled) end
+            end)
+
+            yPos = yPos + 40
+            
+            return {
+                SetState = function(self, state)
+                    toggled = state
+                    Toggle.Text = text .. (state and " [ON]" or " [OFF]")
+                    Toggle.BackgroundColor3 = state and Color3.fromRGB(0, 90, 160) or Color3.fromRGB(50, 50, 50)
+                end,
+                GetState = function(self)
+                    return toggled
+                end
+            }
+        end
+
+        function tabData:AddTextbox(placeholder, callback)
+            if dropdownOpen then return end
+            
+            local Box = Instance.new("TextBox")
+            Box.Size = UDim2.new(1, -20, 0, 30)
+            Box.Position = UDim2.new(0, 10, 0, yPos)
+            Box.PlaceholderText = placeholder
+            Box.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            Box.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Box.Font = Enum.Font.SourceSans
+            Box.TextSize = 16
+            Box.BorderSizePixel = 0
+            Box.ClearTextOnFocus = false
+            Box.Parent = TabFrame
+            
+            local BoxCorner = Instance.new("UICorner")
+            BoxCorner.CornerRadius = UDim.new(0, 4)
+            BoxCorner.Parent = Box
+
+            Box.FocusLost:Connect(function(enterPressed)
+                if callback then callback(Box.Text, enterPressed) end
+            end)
+
+            yPos = yPos + 40
+            
+            return {
+                SetText = function(self, text)
+                    Box.Text = text
+                end,
+                GetText = function(self)
+                    return Box.Text
+                end
+            }
+        end
+
+        function tabData:AddDropdown(title, options, callback)
+            if dropdownOpen then return end
+            
+            local Button = Instance.new("TextButton")
+            Button.Size = UDim2.new(1, -20, 0, 30)
+            Button.Position = UDim2.new(0, 10, 0, yPos)
+            Button.Text = title .. " ▼"
+            Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            Button.TextColor3 = Color3.fromRGB(200, 200, 200)
+            Button.Font = Enum.Font.SourceSans
+            Button.TextSize = 16
+            Button.BorderSizePixel = 0
+            Button.Parent = TabFrame
+            
+            local ButtonCorner = Instance.new("UICorner")
+            ButtonCorner.CornerRadius = UDim.new(0, 4)
+            ButtonCorner.Parent = Button
+
+            local open = false
+            local dropdownFrame = Instance.new("Frame")
+            dropdownFrame.Size = UDim2.new(1, -20, 0, math.min(150, #options * 30))
+            dropdownFrame.Position = UDim2.new(0, 10, 0, yPos + 35)
+            dropdownFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            dropdownFrame.BorderSizePixel = 0
+            dropdownFrame.Visible = false
+            dropdownFrame.Parent = TabFrame
+            
+            local DropdownCorner = Instance.new("UICorner")
+            DropdownCorner.CornerRadius = UDim.new(0, 4)
+            DropdownCorner.Parent = dropdownFrame
+
+            local DropdownScroll = Instance.new("ScrollingFrame")
+            DropdownScroll.Size = UDim2.new(1, 0, 1, 0)
+            DropdownScroll.CanvasSize = UDim2.new(0, 0, 0, #options * 30)
+            DropdownScroll.BackgroundTransparency = 1
+            DropdownScroll.ScrollBarThickness = 6
+            DropdownScroll.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
+            DropdownScroll.Parent = dropdownFrame
+
+            for i, option in ipairs(options) do
+                local Item = Instance.new("TextButton")
+                Item.Size = UDim2.new(1, -10, 0, 25)
+                Item.Position = UDim2.new(0, 5, 0, (i - 1) * 30)
+                Item.Text = option
+                Item.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                Item.TextColor3 = Color3.fromRGB(200, 200, 200)
+                Item.Font = Enum.Font.SourceSans
+                Item.TextSize = 14
+                Item.BorderSizePixel = 0
+                Item.Parent = DropdownScroll
+                
+                local ItemCorner = Instance.new("UICorner")
+                ItemCorner.CornerRadius = UDim.new(0, 4)
+                ItemCorner.Parent = Item
+
+                Item.MouseButton1Click:Connect(function()
+                    if callback then callback(option) end
+                    Button.Text = title .. ": " .. option .. " ▼"
+                    dropdownFrame.Visible = false
+                    open = false
+                    dropdownOpen = nil
+                end)
+            end
+
+            Button.MouseButton1Click:Connect(function()
+                open = not open
+                dropdownFrame.Visible = open
+                Button.Text = title .. (open and " ▲" or " ▼")
+                
+                if open then
+                    dropdownOpen = dropdownFrame
+                else
+                    dropdownOpen = nil
+                end
+            end)
+
+            yPos = yPos + 40
+            
+            return {
+                UpdateOptions = function(self, newOptions)
+                    -- Limpa opções antigas
+                    for _, child in ipairs(DropdownScroll:GetChildren()) do
+                        if child:IsA("TextButton") then
+                            child:Destroy()
+                        end
+                    end
+                    
+                    -- Adiciona novas opções
+                    for i, option in ipairs(newOptions) do
+                        local Item = Instance.new("TextButton")
+                        Item.Size = UDim2.new(1, -10, 0, 25)
+                        Item.Position = UDim2.new(0, 5, 0, (i - 1) * 30)
+                        Item.Text = option
+                        Item.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                        Item.TextColor3 = Color3.fromRGB(200, 200, 200)
+                        Item.Font = Enum.Font.SourceSans
+                        Item.TextSize = 14
+                        Item.BorderSizePixel = 0
+                        Item.Parent = DropdownScroll
+                        
+                        local ItemCorner = Instance.new("UICorner")
+                        ItemCorner.CornerRadius = UDim.new(0, 4)
+                        ItemCorner.Parent = Item
+
+                        Item.MouseButton1Click:Connect(function()
+                            if callback then callback(option) end
+                            Button.Text = title .. ": " .. option .. " ▼"
+                            dropdownFrame.Visible = false
+                            open = false
+                            dropdownOpen = nil
+                        end)
+                    end
+                    
+                    -- Ajusta tamanho do dropdown
+                    dropdownFrame.Size = UDim2.new(1, -20, 0, math.min(150, #newOptions * 30))
+                    DropdownScroll.CanvasSize = UDim2.new(0, 0, 0, #newOptions * 30)
+                end
+            }
+        end
+
+        Tab.MouseButton1Click:Connect(function()
+            for _, obj in pairs(ContentArea:GetChildren()) do
+                if obj:IsA("Frame") then
+                    obj.Visible = false
+                end
+            end
+            TabFrame.Visible = true
+            UpdateTabSelection()
+        end)
+
+        table.insert(TabList, {Tab = Tab, Underline = Underline})
+        return tabData
+    end
+
+    return RobloxUI
+end
+
+return RobloxUI
